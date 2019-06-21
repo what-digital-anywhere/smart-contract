@@ -47,9 +47,6 @@ contract Ticketing {
         address passengerAddress
     );
 
-    constructor() public {
-    }
-
     function checkIn(
         address transporterAddress
     ) public {
@@ -82,6 +79,13 @@ contract Ticketing {
 
     function getTrips(address passengerAddress) public view returns (Trip[] memory) {
         return passengers[passengerAddress].trips;
+    }
+
+    function getTrips(
+        address passengerAddress,
+        uint tripIndex
+    ) public view returns (Trip memory) {
+        return passengers[passengerAddress].trips[tripIndex];
     }
 
     function checkOut() public {
