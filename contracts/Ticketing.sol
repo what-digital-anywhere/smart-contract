@@ -1,6 +1,7 @@
 pragma solidity ^0.5.1;
 pragma experimental ABIEncoderV2;
 
+
 contract Ticketing {
 
     struct Trip {
@@ -52,6 +53,10 @@ contract Ticketing {
     function checkIn(
         address transporterAddress
     ) public {
+        if (passengers[msg.sender].isCheckedIn) {
+            revert("already checked in");
+        }
+        
         Trip memory trip = Trip({
             startTimestamp : now,
             endTimestamp : 0,
@@ -123,7 +128,7 @@ contract Ticketing {
                     revert("only TSP set the price");
                 }
                 tripUnpaid.price = price;
-                
+
                 uint tripIndex = i;
                 address transporterAddress = msg.sender;
                 emit TripPriceSet(
