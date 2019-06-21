@@ -1,0 +1,27 @@
+{
+  "name": "eth-todo-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "remixd": "^0.1.8-alpha.6",
+    "truffle-hdwallet-provider-privkey": "^1.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/what-digital/hackaton-eth-todo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/what-digital/hackaton-eth-todo/issues"
+  },
+  "homepage": "https://gitlab.com/what-digital/hackaton-eth-todo#readme"
+}
