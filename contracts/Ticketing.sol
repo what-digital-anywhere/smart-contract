@@ -90,6 +90,9 @@ contract Ticketing {
 
     function checkOut() public {
         Passenger storage passenger = passengers[msg.sender];
+        if (!!passenger.isCheckedIn) {
+            revert("you're not checked in");
+        }
         Trip[] memory trips = passenger.trips;
         Trip storage trip = passenger.trips[trips.length - 1];
         trip.isCheckedOut = true;
