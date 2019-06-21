@@ -1,17 +1,23 @@
 # Readme
 
-## Run development node
+## Local development instance
 
-- `ganache-cli -h 0.0.0.0 -d -i 1`
+- BEWARE: Run `npm install` at the very beginning! Otherwise ganache will not load the project.
+- Start ganache
+- Run `truffle console --network development` to connect to the ganache testrpc node
 
-## How to deploy a Smart Contract and run its function
+## Remote private network
+
+- Start `ganache-cli -h 0.0.0.0 -d -i 1` on a server and open port 8545
+- 
+
+### How to deploy a Smart Contract and run its function on the private network
 
 - truffle console --network private
 - migrate
 - let instance = await Ticketing.deployed()
-- instance.createTask("test content", "test author")
-- instance.getTask("1")
-
+- instance.createTrip("test content", "test", etc.)
+- instance.getTrip("1")
 
 
 ## Accounts
