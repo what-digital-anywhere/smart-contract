@@ -1,5 +1,5 @@
-pragma solidity ^0.5.0;
-
+pragma solidity ^0.5.1;
+pragma experimental ABIEncoderV2;
 
 contract Ticketing {
     
@@ -58,34 +58,8 @@ contract Ticketing {
         );
     }
 
-    function getTrip(uint id) tripExists(id) public view
-        returns(
-         uint,
-         uint,
-         uint,
-         string memory,
-         string memory,
-         bool,
-         bool,
-         uint,
-    ) {
-        return(
-            id,
-            tasks[id].start,
-            tasks[id].end,
-            tasks[id].transporter,
-            tasks[id].passenger,
-            tasks[id].is_checked_out,
-            tasks[id].is_paid,
-            tasks[id].price,
-        );
+    function getTrips(address passenger) public view returns(Trip[] memory) {
+        return passengers[passenger].trips;
     }
 
-
-    modifier tripExists(uint id) {
-        if(trips[id].id == 0) {
-            revert();
-        }
-        _;
-    }
 }
