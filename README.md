@@ -8,7 +8,7 @@
 
 - truffle console --network private
 - migrate
-- let instance = await ToDo.deployed()
+- let instance = await Ticketing.deployed()
 - instance.createTask("test content", "test author")
 - instance.getTask("1")
 
