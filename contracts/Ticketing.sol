@@ -42,12 +42,12 @@ contract Ticketing {
     }
 
     function checkIn(
-        address transporter
+        address transporterAddress
     ) public {
         Trip memory trip = Trip({
             startTimestamp: now,
             endTimestamp: 0,
-            transporter: transporter,
+            transporter: transporterAddress,
             passenger: msg.sender,
             isCheckedOut: false,
             isPaid: false,
@@ -55,11 +55,11 @@ contract Ticketing {
         });
         passengers[msg.sender].trips.push(trip);
         passengers[msg.sender].isCheckedIn = true;
-        passengers[msg.sender].checkedInTspKey = transporter;
+        passengers[msg.sender].checkedInTspKey = transporterAddress;
         emit TripCreated(
             now,
             0,
-            transporter,
+            transporterAddress,
             msg.sender,
             false,
             false,
@@ -67,8 +67,8 @@ contract Ticketing {
         );
     }
 
-    function getTrips(address passenger) public view returns(Trip[] memory) {
-        return passengers[passenger].trips;
+    function getTrips(address passengerAddress) public view returns(Trip[] memory) {
+        return passengers[passengerAddress].trips;
     }
     
     function checkOut() public {
@@ -79,7 +79,7 @@ contract Ticketing {
         trip.endTimestamp = now;
         
         passenger.isCheckedIn = false;
-        passenger.checkedInTspKey = 0;
+        passenger.checkedInTspKey = address(0);
         
         emit CheckedOut(
             trip.startTimestamp,
@@ -89,8 +89,16 @@ contract Ticketing {
         );
         
     }
-
-    function setPrice(address passenger) public {
-        
-    }
+//
+//    function setPrice(address passengerAddress, unit price) public {
+//        Passenger storage passenger = passengers[passengerAddress];
+//        tripLast = passenger.trips;
+//        
+//        memory 
+//        
+//        for (uint i = passenger.trips.leng; i<studentList.length; i++) {
+//            emit LogStudentGrade(studentList[i], studentStructs[studentList[i]].grade);
+//        }
+//
+//    }
 }
