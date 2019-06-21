@@ -148,4 +148,20 @@ contract Ticketing {
             }
         }
     }
+    
+    function payForTrip(uint tripIndex) public payable {
+        Passenger storage passenger = passengers[msg.sender];
+        Trip storage trip = passenger.trips[tripIndex];
+        
+        if (trip.price == 0 || trip.isPaid || !!trip.isCheckedOut) {
+            revert("this trip isn't payable yet");
+        }
+        if (msg.value < trip.price) {
+            revert("not enough money was sent");
+        }
+        
+        trip.isPaid = true;
+        
+        trip.transporter.transfer(msg.value);
+    }
 }
