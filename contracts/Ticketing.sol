@@ -30,11 +30,18 @@ contract Ticketing {
         bool isPaid,
         uint price
     );
+    
+    event CheckedOut(
+        uint startTimestamp,
+        uint endTimestamp,
+        address transporter,
+        address passenger
+    );
 
     constructor() public {
     }
 
-    function createTrip(
+    function checkIn(
         address transporter
     ) public {
         Trip memory trip = Trip({
@@ -60,6 +67,21 @@ contract Ticketing {
 
     function getTrips(address passenger) public view returns(Trip[] memory) {
         return passengers[passenger].trips;
+    }
+    
+    function checkOut() public {
+        Trip[] memory trips = passengers[msg.sender].trips;
+        Trip storage trip = passengers[msg.sender].trips[trips.length - 1];
+        trip.isCheckedOut = true;
+        trip.endTimestamp = now;
+        
+        emit CheckedOut(
+            trip.startTimestamp,
+            trip.endTimestamp,
+            trip.transporter,
+            trip.passenger
+        );
+        
     }
 
 }
