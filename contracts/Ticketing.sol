@@ -54,6 +54,8 @@ contract Ticketing {
             price: 0
         });
         passengers[msg.sender].trips.push(trip);
+        passengers[msg.sender].isCheckedIn = true;
+        passengers[msg.sender].checkedInTspKey = transporter;
         emit TripCreated(
             now,
             0,
@@ -70,10 +72,14 @@ contract Ticketing {
     }
     
     function checkOut() public {
-        Trip[] memory trips = passengers[msg.sender].trips;
-        Trip storage trip = passengers[msg.sender].trips[trips.length - 1];
+        Passenger storage passenger = passengers[msg.sender];
+        Trip[] memory trips = passenger.trips;
+        Trip storage trip = passenger.trips[trips.length - 1];
         trip.isCheckedOut = true;
         trip.endTimestamp = now;
+        
+        passenger.isCheckedIn = false;
+        passenger.checkedInTspKey = 0;
         
         emit CheckedOut(
             trip.startTimestamp,
@@ -84,5 +90,7 @@ contract Ticketing {
         
     }
 
+    function setPrice(address passenger) public {
+        
+    }
 }
-
