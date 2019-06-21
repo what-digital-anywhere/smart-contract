@@ -9,7 +9,7 @@
 ## Remote private network
 
 - Start `ganache-cli -h 0.0.0.0 -d -i 1` on a server and open port 8545
-- 
+
 
 ### How to deploy a Smart Contract and run its function on the private network
 

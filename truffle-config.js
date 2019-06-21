@@ -24,11 +24,15 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+
+
+// private network credentials (exoscale ganache-cli in deterministic mode)
 var PrivKeyProvider = require("truffle-hdwallet-provider-privkey");
 var from_address = "0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1";
 var privateKeys = [
     "4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"
-]
+];
+
 
 module.exports = {
   /**
@@ -81,9 +85,6 @@ module.exports = {
       provider: function() {
         return new PrivKeyProvider(privateKeys, "http://159.100.249.117:8545");
       },
-      // host: "159.100.249.117",
-      // port: "8545",
-      // provider: () => new HDWalletProvider("5a0c7ebc7839bcee1796bcf34e2a00bc863cff6c5a758a5416a239646eae3554", "http://159.100.249.117"),
       network_id: "*",   // This network is yours, in the cloud.
       production: true    // Treats this network as if it was a public net. (default: false)
     }
