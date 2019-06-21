@@ -9,7 +9,7 @@ w3 = Web3(Web3.WebsocketProvider("ws://localhost:9545"))
 
 
 
-with open('../build/contracts/ToDo.json') as json_file:
+with open('../build/contracts/Ticketing.json') as json_file:
     abiJson = json.load(json_file)
 
 

@@ -1,6 +1,6 @@
 
-var ToDo = artifacts.require("./Ticketing.sol");
+var Ticketing = artifacts.require("./Ticketing.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(ToDo);
+  deployer.deploy(Ticketing);
 };

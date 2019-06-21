@@ -1,5 +1,5 @@
 {
-  "name": "eth-todo-demo",
+  "name": "mobility-ticketing",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -16,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/what-digital/hackaton-eth-todo.git"
+    "url": ""
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/what-digital/hackaton-eth-todo/issues"
+    "url": ""
   },
-  "homepage": "https://gitlab.com/what-digital/hackaton-eth-todo#readme"
+  "homepage": ""
 }
