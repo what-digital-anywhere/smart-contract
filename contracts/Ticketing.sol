@@ -7,7 +7,7 @@ contract Ticketing {
     struct Trip {
         uint startTimestamp;
         uint endTimestamp;
-        address transporter;
+        address payable transporter;
         address passenger;
         bool isCheckedOut;
         bool isPaid;
@@ -25,7 +25,7 @@ contract Ticketing {
     event TripCreated(
         uint startTimestamp,
         uint endTimestamp,
-        address transporter,
+        address payable transporter,
         address passenger,
         bool isCheckedOut,
         bool isPaid,
@@ -36,19 +36,19 @@ contract Ticketing {
         uint tripIndex,
         uint startTimestamp,
         uint endTimestamp,
-        address transporter,
+        address payable transporter,
         address passenger
     );
 
     event TripPriceSet(
         uint tripIndex,
         uint price,
-        address transporterAddress,
+        address payable transporterAddress,
         address passengerAddress
     );
 
     function checkIn(
-        address transporterAddress
+        address payable transporterAddress
     ) public {
         if (passengers[msg.sender].isCheckedIn) {
             revert("already checked in");
@@ -137,7 +137,7 @@ contract Ticketing {
                 tripUnpaid.price = price;
 
                 uint tripIndex = i;
-                address transporterAddress = msg.sender;
+                address payable transporterAddress = msg.sender;
                 emit TripPriceSet(
                     tripIndex,
                     price,
