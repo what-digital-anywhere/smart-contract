@@ -132,7 +132,7 @@ contract Ticketing {
                 Trip storage tripUnpaid = trip;
                 bool isHasNoPermissionToSetPrice = msg.sender != trip.transporter;
                 if (isHasNoPermissionToSetPrice) {
-                    revert("only TSP set the price");
+                    revert("only TSP can set the price");
                 }
                 tripUnpaid.price = price;
 
