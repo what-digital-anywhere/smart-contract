@@ -109,7 +109,6 @@ contract Ticketing {
             trip.transporter,
             trip.passenger
         );
-
     }
 
     function setPrice(
@@ -122,7 +121,7 @@ contract Ticketing {
         uint tripIndexLast = passenger.trips.length - 1;
 
         bool isTripMatched = false;
-        for (uint i = tripIndexLast; i > 0; i--) {
+        for (uint i = tripIndexLast; i >= 0; i--) {
             Trip storage trip = passenger.trips[i];
             isTripMatched = (
                 trip.isCheckedOut && 
@@ -145,6 +144,9 @@ contract Ticketing {
                     transporterAddress,
                     passengerAddress
                 );
+                break;
+            }
+            if (i == 0) {
                 break;
             }
         }
