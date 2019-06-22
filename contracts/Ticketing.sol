@@ -20,7 +20,16 @@ contract Ticketing {
         Trip[] trips;
     }
 
+    struct Sponsorship {
+        uint cashBackPercentage;
+        uint amount;
+    }
+
+    uint PERCENTAGE_CONVERSION_BASE = 10000;
+
     mapping(address => Passenger) public passengers;
+
+    mapping(address => Sponsorship[]) cashBacks;
 
     event TripCreated(
         uint startTimestamp,
@@ -46,6 +55,24 @@ contract Ticketing {
         address payable transporterAddress,
         address passengerAddress
     );
+
+
+    function getPassenger(address passengerAddress) public view returns (Passenger memory) {
+        return passengers[passengerAddress];
+    }
+
+
+    function getTrips(address passengerAddress) public view returns (Trip[] memory) {
+        return passengers[passengerAddress].trips;
+    }
+
+    function getTrips(
+        address passengerAddress,
+        uint tripIndex
+    ) public view returns (Trip memory) {
+        return passengers[passengerAddress].trips[tripIndex];
+    }
+
 
     function checkIn(
         address payable transporterAddress
@@ -75,17 +102,6 @@ contract Ticketing {
             false,
             0
         );
-    }
-
-    function getTrips(address passengerAddress) public view returns (Trip[] memory) {
-        return passengers[passengerAddress].trips;
-    }
-
-    function getTrips(
-        address passengerAddress,
-        uint tripIndex
-    ) public view returns (Trip memory) {
-        return passengers[passengerAddress].trips[tripIndex];
     }
 
     function checkOut() public {
@@ -154,8 +170,8 @@ contract Ticketing {
             revert("no trip was matched");
         }
     }
-    
-    function payForTrip(uint tripIndex) public payable {
+
+    function payForTrip(uint tripIndex) public payable returns(uint) {
         Passenger storage passenger = passengers[msg.sender];
         Trip storage trip = passenger.trips[tripIndex];
         
@@ -166,8 +182,38 @@ contract Ticketing {
             revert("not enough money was sent");
         }
         
+        uint priceNew = trip.price;
+        
+        Sponsorship[] storage sponsorshipArray = cashBacks[trip.transporter];
+        
+        for (uint i = 0; i < sponsorshipArray.length; i++) {
+            Sponsorship memory sponsorship = sponsorshipArray[i];
+            uint priceDiscount = (
+                trip.price * (sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE)
+            );
+            if (priceNew >= priceDiscount) {
+                priceNew = priceNew - priceDiscount;
+            } else {
+                break;
+            }
+        }
+        
         trip.isPaid = true;
         
         trip.transporter.transfer(msg.value);
+        
+        uint cashBackAmountInWei = trip.price - priceNew;
+        return cashBackAmountInWei;
+    }
+    
+    function sponsor(
+        address transporterAddress,
+        uint percentage
+    ) public payable {
+        Sponsorship memory sponsorship = Sponsorship({
+            cashBackPercentage: percentage,
+            amount: msg.value
+        });
+        cashBacks[transporterAddress].push(sponsorship);
     }
 }
