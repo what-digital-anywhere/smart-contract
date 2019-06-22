@@ -121,11 +121,12 @@ contract Ticketing {
 
         uint tripIndexLast = passenger.trips.length - 1;
 
+        bool isTripMatched = false;
         for (uint i = tripIndexLast; i > 0; i--) {
             Trip storage trip = passenger.trips[i];
-            bool isTripMatched = (
-                trip.isCheckedOut &&
-                !!trip.isPaid &&
+            isTripMatched = (
+                trip.isCheckedOut && 
+                trip.isPaid == false &&
                 trip.startTimestamp == tripStartTimestamp
             );
             if (isTripMatched) {
@@ -147,13 +148,16 @@ contract Ticketing {
                 break;
             }
         }
+        if (isTripMatched == false) {
+            revert("no trip was matched");
+        }
     }
     
     function payForTrip(uint tripIndex) public payable {
         Passenger storage passenger = passengers[msg.sender];
         Trip storage trip = passenger.trips[tripIndex];
         
-        if (trip.price == 0 || trip.isPaid || !!trip.isCheckedOut) {
+        if (trip.price == 0 || trip.isPaid || trip.isCheckedOut == false) {
             revert("this trip isn't payable yet");
         }
         if (msg.value < trip.price) {
