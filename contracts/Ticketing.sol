@@ -96,6 +96,7 @@ contract Ticketing {
             isCheckedOut : false,
             isJourneyStart : true,
             isJourneyEnd : false,
+            journeyId : 0,
             isPaid : false,
             price : 0
         });
@@ -103,7 +104,7 @@ contract Ticketing {
 
         if (isJourneyStart) {
             trip.isJourneyStart = true;
-            trip.journeyId = trip.passenger + trip.startTimestamp;
+            trip.journeyId = uint(trip.passenger) + trip.startTimestamp;
         } else {
             trip.isJourneyStart = false;
         }
