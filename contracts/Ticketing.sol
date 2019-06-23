@@ -32,7 +32,7 @@ contract Ticketing {
 
     mapping(address => Passenger) public passengers;
 
-    mapping(address => Sponsorship[]) cashBacks;
+    mapping(address => Sponsorship[]) cashBackProviders;
 
     event TripCreated(
         uint startTimestamp,
@@ -104,6 +104,8 @@ contract Ticketing {
             trip.journeyId = uint(trip.passenger) + trip.startTimestamp;
         } else {
             trip.isJourneyStart = false;
+            Trip[] memory trips = passengers[msg.sender].trips;
+            trip.journeyId = trips[trips.length - 1].journeyId;
         }
 
         passengers[msg.sender].trips.push(trip);
@@ -200,7 +202,8 @@ contract Ticketing {
             revert("not enough money was sent");
         }
         
-        (uint priceExcludingCashBack, uint moneyCompensationFromSponsors) = calculateNewPriceAndCompensationFromSponsors(trip);
+        (uint priceExcludingCashBack, uint moneyCompensationFromSponsors) = 
+            calculatePriceExcludingCashBackAndCompensationFromSponsors(trip);
 
         trip.transporter.transfer(priceExcludingCashBack);
         trip.transporter.transfer(moneyCompensationFromSponsors);
@@ -219,28 +222,28 @@ contract Ticketing {
             cashBackPercentage: percentage,
             balance: msg.value
         });
-        cashBacks[transporterAddress].push(sponsorship);
+        cashBackProviders[transporterAddress].push(sponsorship);
     }
     
-    function calculateNewPriceAndCompensationFromSponsors(
+    function calculatePriceExcludingCashBackAndCompensationFromSponsors(
         Trip storage trip
     ) private returns(uint, uint) {
         uint priceExcludingCashBack = trip.price;
         uint moneyCompensationFromSponsors = 0;
         
-        Sponsorship[] storage sponsorshipArray = cashBacks[trip.transporter];
+        Sponsorship[] storage sponsorshipArray = cashBackProviders[trip.transporter];
         
         for (uint i = 0; i < sponsorshipArray.length; i++) {
             Sponsorship storage sponsorship = sponsorshipArray[i];
-            uint cahsBack = (
+            uint cashBack = (
                 trip.price * (sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE)
             );
             
-            bool isCanApplyDiscount = priceExcludingCashBack >= cahsBack && sponsorship.balance >= cahsBack;
-            if (isCanApplyDiscount) {
-                priceExcludingCashBack = priceExcludingCashBack - cahsBack;
-                sponsorship.balance = sponsorship.balance - cahsBack;
-                moneyCompensationFromSponsors = moneyCompensationFromSponsors + cahsBack;
+            bool isCanProvideCashBack = priceExcludingCashBack >= cashBack && sponsorship.balance >= cashBack;
+            if (isCanProvideCashBack) {
+                priceExcludingCashBack -= cashBack;
+                sponsorship.balance -= cashBack;
+                moneyCompensationFromSponsors += cashBack;
             }
         }
         return (priceExcludingCashBack, moneyCompensationFromSponsors);
