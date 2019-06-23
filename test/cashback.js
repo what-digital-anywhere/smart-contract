@@ -65,12 +65,12 @@ contract("Ticketing", function (accounts) {
         );
         
         let percentage40 = 4000;
-        let value60Dollars = '4000000000000';
+        let value60Dollars = '100000000000000000';
         await contract.sponsor(
             tsp, percentage40, {from: sponsor, value: value60Dollars}
         );
         
-        let percentage20 = 3000;
+        let percentage20 = 2000;
         await contract.sponsor(
             tsp, percentage20, {from: sponsor2, value: value60Dollars}
         );
@@ -80,9 +80,6 @@ contract("Ticketing", function (accounts) {
             tripIndex, {from: passenger, value: price30Dollars}
         );
         console.log(parseInt(result));
-        if (parseInt(result) === 100000000000000000) {
-            throw Error();
-        }
     });
 
 });
