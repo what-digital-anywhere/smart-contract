@@ -60,6 +60,7 @@ contract Ticketing {
     );
 
 
+
     function getPassenger(address passengerAddress) public view returns (Passenger memory) {
         return passengers[passengerAddress];
     }
@@ -224,7 +225,7 @@ contract Ticketing {
         });
         cashBackProviders[transporterAddress].push(sponsorship);
     }
-    
+
     function calculatePriceExcludingCashBackAndCompensationFromSponsors(
         Trip storage trip
     ) private returns(uint, uint) {
@@ -232,13 +233,11 @@ contract Ticketing {
         uint moneyCompensationFromSponsors = 0;
         
         Sponsorship[] storage sponsorshipArray = cashBackProviders[trip.transporter];
-        
+
         for (uint i = 0; i < sponsorshipArray.length; i++) {
             Sponsorship storage sponsorship = sponsorshipArray[i];
-            uint cashBack = (
-                trip.price * (sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE)
-            );
-            
+            uint cashBack = trip.price * sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE;
+          
             bool isCanProvideCashBack = priceExcludingCashBack >= cashBack && sponsorship.balance >= cashBack;
             if (isCanProvideCashBack) {
                 priceExcludingCashBack -= cashBack;
