@@ -7,6 +7,9 @@ contract Ticketing {
     struct Trip {
         uint startTimestamp;
         uint endTimestamp;
+        bool isJourneyStart;
+        bool isJourneyEnd;
+        uint journeyId;
         address payable transporter;
         address passenger;
         bool isCheckedOut;
@@ -75,21 +78,44 @@ contract Ticketing {
 
 
     function checkIn(
-        address payable transporterAddress
+        address payable transporterAddress,
+        bool isJourneyStart,
+        bool isJourneyEnd
     ) public {
         if (passengers[msg.sender].isCheckedIn) {
             revert("already checked in");
         }
-        
+
+        Trip[] memory trips = passengers[msg.sender].trips;
+
         Trip memory trip = Trip({
             startTimestamp : now,
             endTimestamp : 0,
             transporter : transporterAddress,
             passenger : msg.sender,
             isCheckedOut : false,
+            isJourneyStart : true,
+            isJourneyEnd : false,
             isPaid : false,
             price : 0
         });
+
+
+        if (isJourneyStart) {
+            trip.isJourneyStart = true;
+            trip.journeyId = trip.passenger + trip.startTimestamp;
+        } else {
+            trip.isJourneyStart = false;
+        }
+        if (isJourneyEnd) {
+            trip.isJourneyEnd = true;
+            trip.journeyId = trips[trips.length - 1].journeyId;
+        } else {
+            trip.isJourneyEnd = false;
+            trip.journeyId = trips[trips.length - 1].journeyId;
+        }
+
+
         passengers[msg.sender].trips.push(trip);
         passengers[msg.sender].isCheckedIn = true;
         passengers[msg.sender].checkedInTspKey = transporterAddress;
