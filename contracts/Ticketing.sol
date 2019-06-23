@@ -25,7 +25,7 @@ contract Ticketing {
 
     struct Sponsorship {
         uint cashBackPercentage;
-        uint amount;
+        uint balance;
     }
 
     uint PERCENTAGE_CONVERSION_BASE = 10000;
@@ -79,14 +79,11 @@ contract Ticketing {
 
     function checkIn(
         address payable transporterAddress,
-        bool isJourneyStart,
-        bool isJourneyEnd
+        bool isJourneyStart
     ) public {
         if (passengers[msg.sender].isCheckedIn) {
             revert("already checked in");
         }
-
-        Trip[] memory trips = passengers[msg.sender].trips;
 
         Trip memory trip = Trip({
             startTimestamp : now,
@@ -108,14 +105,6 @@ contract Ticketing {
         } else {
             trip.isJourneyStart = false;
         }
-        if (isJourneyEnd) {
-            trip.isJourneyEnd = true;
-            trip.journeyId = trips[trips.length - 1].journeyId;
-        } else {
-            trip.isJourneyEnd = false;
-            trip.journeyId = trips[trips.length - 1].journeyId;
-        }
-
 
         passengers[msg.sender].trips.push(trip);
         passengers[msg.sender].isCheckedIn = true;
@@ -131,7 +120,7 @@ contract Ticketing {
         );
     }
 
-    function checkOut() public {
+    function checkOut(bool isJourneyEnd) public {
         Passenger storage passenger = passengers[msg.sender];
         if (!passenger.isCheckedIn) {
             revert("you're not checked in");
@@ -140,6 +129,8 @@ contract Ticketing {
         Trip storage trip = passenger.trips[trips.length - 1];
         trip.isCheckedOut = true;
         trip.endTimestamp = now;
+        
+        trip.isJourneyEnd = isJourneyEnd;
 
         passenger.isCheckedIn = false;
         passenger.checkedInTspKey = address(0);
@@ -209,27 +200,14 @@ contract Ticketing {
             revert("not enough money was sent");
         }
         
-        uint priceNew = trip.price;
-        
-        Sponsorship[] storage sponsorshipArray = cashBacks[trip.transporter];
-        
-        for (uint i = 0; i < sponsorshipArray.length; i++) {
-            Sponsorship memory sponsorship = sponsorshipArray[i];
-            uint priceDiscount = (
-                trip.price * (sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE)
-            );
-            if (priceNew >= priceDiscount) {
-                priceNew = priceNew - priceDiscount;
-            } else {
-                break;
-            }
-        }
+        (uint priceExcludingCashBack, uint moneyCompensationFromSponsors) = calculateNewPriceAndCompensationFromSponsors(trip);
+
+        trip.transporter.transfer(priceExcludingCashBack);
+        trip.transporter.transfer(moneyCompensationFromSponsors);
         
         trip.isPaid = true;
-        
-        trip.transporter.transfer(msg.value);
-        
-        uint cashBackAmountInWei = trip.price - priceNew;
+
+        uint cashBackAmountInWei = moneyCompensationFromSponsors;
         return cashBackAmountInWei;
     }
     
@@ -239,8 +217,32 @@ contract Ticketing {
     ) public payable {
         Sponsorship memory sponsorship = Sponsorship({
             cashBackPercentage: percentage,
-            amount: msg.value
+            balance: msg.value
         });
         cashBacks[transporterAddress].push(sponsorship);
+    }
+    
+    function calculateNewPriceAndCompensationFromSponsors(
+        Trip storage trip
+    ) private returns(uint, uint) {
+        uint priceExcludingCashBack = trip.price;
+        uint moneyCompensationFromSponsors = 0;
+        
+        Sponsorship[] storage sponsorshipArray = cashBacks[trip.transporter];
+        
+        for (uint i = 0; i < sponsorshipArray.length; i++) {
+            Sponsorship storage sponsorship = sponsorshipArray[i];
+            uint cahsBack = (
+                trip.price * (sponsorship.cashBackPercentage / PERCENTAGE_CONVERSION_BASE)
+            );
+            
+            bool isCanApplyDiscount = priceExcludingCashBack >= cahsBack && sponsorship.balance >= cahsBack;
+            if (isCanApplyDiscount) {
+                priceExcludingCashBack = priceExcludingCashBack - cahsBack;
+                sponsorship.balance = sponsorship.balance - cahsBack;
+                moneyCompensationFromSponsors = moneyCompensationFromSponsors + cahsBack;
+            }
+        }
+        return (priceExcludingCashBack, moneyCompensationFromSponsors);
     }
 }
